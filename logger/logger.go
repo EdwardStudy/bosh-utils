@@ -163,7 +163,12 @@ func (l *logger) ToggleForcedDebug() {
 func (l *logger) printf(tag, msg string, args ...interface{}) {
 	s := fmt.Sprintf(msg, args...)
 	l.loggerMu.Lock()
-	l.logger.SetPrefix("[" + tag + "] ")
+	originPrefix := l.logger.Prefix()
+	if originPrefix != "" && !strings.HasPrefix(originPrefix, "[") {
+		l.logger.SetPrefix(l.logger.Prefix() + " [" + tag + "] ")
+	} else {
+		l.logger.SetPrefix("[" + tag + "] ")
+	}
 	l.logger.Output(2, s)
 	l.loggerMu.Unlock()
 }
